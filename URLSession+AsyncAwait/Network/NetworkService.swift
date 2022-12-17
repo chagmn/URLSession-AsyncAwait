@@ -7,10 +7,9 @@
 
 import Foundation
 
-final class NetworkService {
-    private let key = "_qHlB1wp5K6j4OdRuXa_AXImQonuJjDDOIHUDJ27ppE"
-    
-    func fetchImage(page: Int = 1) {
+struct NetworkService {
+    static func fetchImage(page: Int = 1, completion: @escaping ([Image]) -> Void) {
+        let key = "_qHlB1wp5K6j4OdRuXa_AXImQonuJjDDOIHUDJ27ppE"
         let urlString = "https://api.unsplash.com/photos?client_id=\(key)&page=\(page)&per_page=30&orientation=landscape"
         
         if let url = URL(string: urlString) {
@@ -19,8 +18,15 @@ final class NetworkService {
                     print(error.localizedDescription)
                     
                 } else if let response = response as? HTTPURLResponse, let data = data {
-                    print(response)
-                    print(data)
+                    if response.statusCode > 400 { return }
+                    
+                    do {
+                        let imageData = try JSONDecoder().decode([Image].self, from: data)
+                        completion(imageData)
+                        
+                    } catch {
+                        print(error.localizedDescription)
+                    }
                 }
             }.resume()
         }

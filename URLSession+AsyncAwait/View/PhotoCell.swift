@@ -12,7 +12,7 @@ import SnapKit
 final class PhotoCell: UICollectionViewCell {
     static let identifier = "photoCell"
     
-    private lazy var imageView = {
+    lazy var imageView = {
         let imageView = UIImageView()
         imageView.layer.cornerRadius = 12
         imageView.layer.masksToBounds = true

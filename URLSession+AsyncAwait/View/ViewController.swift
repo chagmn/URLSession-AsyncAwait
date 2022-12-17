@@ -11,6 +11,8 @@ import SnapKit
 
 final class ViewController: UIViewController {
 
+    private var imageArr: [Image] = []
+    
     private lazy var imageCollectionView = {
         let collectionViewLayout = UICollectionViewFlowLayout()
         
@@ -26,9 +28,7 @@ final class ViewController: UIViewController {
         view.backgroundColor = .white
         
         setupView()
-        
-        let a = NetworkService()
-        a.fetchImage()
+        fetchImages()
     }
 }
 
@@ -39,6 +39,14 @@ private extension ViewController {
         imageCollectionView.snp.makeConstraints {
             $0.top.bottom.equalTo(view.safeAreaLayoutGuide)
             $0.leading.trailing.equalToSuperview().inset(4)
+        }
+    }
+    
+    func fetchImages(page: Int = 1) {
+        NetworkService.fetchImage(page: page) { [weak self] imageData in
+            page == 1 ? self?.imageArr = imageData : self?.imageArr.append(contentsOf: imageData)
+            
+            self?.imageCollectionView.reloadData()
         }
     }
 }
@@ -61,6 +69,18 @@ extension ViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCell.identifier, for: indexPath) as? PhotoCell else { return UICollectionViewCell() }
                 
+        let imageDownloadURL = URL(string: imageArr[indexPath.row].links.downloadURL)!
+        URLSession.shared.dataTask(with: imageDownloadURL) { data, response, error in
+            if let error = error {
+                print(error.localizedDescription)
+                
+            } else if let data = data {
+                DispatchQueue.main.async {
+                    cell.imageView.image = UIImage(data: data)
+                }
+            }
+        }.resume()
+        
         return cell
     }
 }
