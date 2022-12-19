@@ -7,28 +7,21 @@
 
 import Foundation
 
+// 임시 에러정의
+enum FetchError: Error {
+    case failURL
+    case not200
+}
+
 struct NetworkService {
-    static func fetchImage(page: Int = 1, completion: @escaping ([Image]) -> Void) {
+    static func fetchImage(page: Int = 1) async throws -> [Image] {
         let key = "_qHlB1wp5K6j4OdRuXa_AXImQonuJjDDOIHUDJ27ppE"
         let urlString = "https://api.unsplash.com/photos?client_id=\(key)&page=\(page)&per_page=30&orientation=landscape"
         
-        if let url = URL(string: urlString) {
-            URLSession.shared.dataTask(with: url) { data, response, error in
-                if let error = error {
-                    print(error.localizedDescription)
-                    
-                } else if let response = response as? HTTPURLResponse, let data = data {
-                    if response.statusCode > 400 { return }
-                    
-                    do {
-                        let imageData = try JSONDecoder().decode([Image].self, from: data)
-                        completion(imageData)
-                        
-                    } catch {
-                        print(error.localizedDescription)
-                    }
-                }
-            }.resume()
-        }
+        guard let url = URL(string: urlString) else { throw FetchError.failURL }
+        let (data, response) = try await URLSession.shared.data(from: url)
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else { throw FetchError.not200 }
+        let imageData = try JSONDecoder().decode([Image].self, from: data)
+        return imageData
     }
 }

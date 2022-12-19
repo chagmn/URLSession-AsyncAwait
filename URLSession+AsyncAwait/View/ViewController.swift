@@ -43,10 +43,10 @@ private extension ViewController {
     }
     
     func fetchImages(page: Int = 1) {
-        NetworkService.fetchImage(page: page) { [weak self] imageData in
-            page == 1 ? self?.imageArr = imageData : self?.imageArr.append(contentsOf: imageData)
-            
-            self?.imageCollectionView.reloadData()
+        Task {
+            let imageData = try await NetworkService.fetchImage(page: page)
+            page == 1 ? imageArr = imageData : imageArr.append(contentsOf: imageData)
+            imageCollectionView.reloadData()
         }
     }
 }
@@ -59,6 +59,7 @@ extension ViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
         return 4
     }
+    
 }
 
 extension ViewController: UICollectionViewDataSource {
@@ -69,6 +70,7 @@ extension ViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCell.identifier, for: indexPath) as? PhotoCell else { return UICollectionViewCell() }
                 
+        if imageArr.count <= 0 { return cell }
         let imageDownloadURL = URL(string: imageArr[indexPath.row].links.downloadURL)!
         URLSession.shared.dataTask(with: imageDownloadURL) { data, response, error in
             if let error = error {
