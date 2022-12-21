@@ -44,9 +44,16 @@ private extension ViewController {
     
     func fetchImages(page: Int = 1) {
         Task {
-            let imageData = try await NetworkService.fetchImage(page: page)
-            page == 1 ? imageArr = imageData : imageArr.append(contentsOf: imageData)
-            imageCollectionView.reloadData()
+            do {
+                let imageData = try await NetworkService.fetchImage(page: page)
+                page == 1 ? imageArr = imageData : imageArr.append(contentsOf: imageData)
+                imageCollectionView.reloadData()
+                
+            } catch FetchError.invaildServerResponse {
+                print("FetchError - invaildServerResponse")
+            } catch FetchError.invaildURL {
+                print("FetchError - invaildURL")
+            }
         }
     }
 }
