@@ -92,6 +92,7 @@ extension ViewController: UICollectionViewDataSource {
         let imageDownloadURL = URL(string: downloadURLStr)!
         
         if let cachedImage = ImageCacheManager.shared.cachedImage(urlString: downloadURLStr) {
+            print("캐싱 ", indexPath.row)
             cell.imageView.image = cachedImage
             return cell
         }
@@ -114,7 +115,23 @@ extension ViewController: UICollectionViewDataSource {
 
 extension ViewController: UICollectionViewDataSourcePrefetching {
     func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
-        
+        for indexPath in indexPaths {
+            let imageUrl: String = imageArr[indexPath.row].links.downloadURL
+            print("prefetch ", indexPath.row)
+            guard let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: PhotoCell.identifier,
+                for: indexPath
+            ) as? PhotoCell else { return }
+            
+            DispatchQueue.global().async {
+                guard let data = try? Data(contentsOf: URL(string: imageUrl)!) else { return }
+                
+                DispatchQueue.main.async {
+                    cell.imageView.image = UIImage(data: data)
+                }
+            }
+          
+        }
     }
 }
 
