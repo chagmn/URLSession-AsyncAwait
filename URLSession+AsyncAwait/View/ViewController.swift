@@ -12,6 +12,7 @@ import SnapKit
 final class ViewController: UIViewController {
 
     private var imageArr: [Image] = []
+    private var page: Int = 0
     
     private lazy var imageCollectionView = {
         let collectionViewLayout = UICollectionViewFlowLayout()
@@ -19,6 +20,7 @@ final class ViewController: UIViewController {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: collectionViewLayout)
         collectionView.delegate = self
         collectionView.dataSource = self
+        collectionView.prefetchDataSource = self
         collectionView.register(PhotoCell.self, forCellWithReuseIdentifier: PhotoCell.identifier)
         return collectionView
     }()
@@ -42,7 +44,9 @@ private extension ViewController {
         }
     }
     
-    func fetchImages(page: Int = 1) {
+    func fetchImages() {
+        page += 1
+        
         Task {
             do {
                 let imageData = try await NetworkService.fetchImage(page: page)
@@ -67,11 +71,17 @@ extension ViewController: UICollectionViewDelegateFlowLayout {
         return 4
     }
     
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        
+        let width = (view.window?.windowScene?.screen.bounds.width)!
+        return CGSize(width: width-20, height: 500)
+    }
+    
 }
 
 extension ViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 20
+        return imageArr.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -91,5 +101,24 @@ extension ViewController: UICollectionViewDataSource {
         }.resume()
         
         return cell
+    }
+}
+
+extension ViewController: UICollectionViewDataSourcePrefetching {
+    func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
+        
+    }
+}
+
+extension ViewController: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let contentHeight = scrollView.contentSize.height
+        let yOffset = scrollView.contentOffset.y
+        let heightRemainBottomHeight = contentHeight - yOffset
+        
+        let frameHeight = scrollView.frame.size.height
+        if heightRemainBottomHeight < frameHeight {
+            fetchImages()
+        }
     }
 }
