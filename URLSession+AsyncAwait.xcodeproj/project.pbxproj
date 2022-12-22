@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		764EF4312954A3C300EB3AD2 /* ImageCacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 764EF4302954A3C300EB3AD2 /* ImageCacheManager.swift */; };
 		76991C79294DBC1800EB0D08 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76991C78294DBC1800EB0D08 /* AppDelegate.swift */; };
 		76991C7B294DBC1800EB0D08 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76991C7A294DBC1800EB0D08 /* SceneDelegate.swift */; };
 		76991C7D294DBC1800EB0D08 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76991C7C294DBC1800EB0D08 /* ViewController.swift */; };
@@ -19,6 +20,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		764EF4302954A3C300EB3AD2 /* ImageCacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCacheManager.swift; sourceTree = "<group>"; };
 		76991C75294DBC1800EB0D08 /* URLSession+AsyncAwait.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "URLSession+AsyncAwait.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		76991C78294DBC1800EB0D08 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		76991C7A294DBC1800EB0D08 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -62,6 +64,7 @@
 		76991C77294DBC1800EB0D08 /* URLSession+AsyncAwait */ = {
 			isa = PBXGroup;
 			children = (
+				764EF4302954A3C300EB3AD2 /* ImageCacheManager.swift */,
 				76991C8F294DE5B600EB0D08 /* Network */,
 				76991C91294DE5CE00EB0D08 /* Model */,
 				76991C90294DE5C600EB0D08 /* View */,
@@ -176,6 +179,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				76991C7D294DBC1800EB0D08 /* ViewController.swift in Sources */,
+				764EF4312954A3C300EB3AD2 /* ImageCacheManager.swift in Sources */,
 				76991C95294DEFE900EB0D08 /* PhotoCell.swift in Sources */,
 				76991C93294DE5EF00EB0D08 /* Image.swift in Sources */,
 				76991C79294DBC1800EB0D08 /* AppDelegate.swift in Sources */,

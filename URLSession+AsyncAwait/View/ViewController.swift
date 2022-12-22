@@ -88,13 +88,21 @@ extension ViewController: UICollectionViewDataSource {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCell.identifier, for: indexPath) as? PhotoCell else { return UICollectionViewCell() }
                 
         if imageArr.count <= 0 { return cell }
-        let imageDownloadURL = URL(string: imageArr[indexPath.row].links.downloadURL)!
+        let downloadURLStr: String = imageArr[indexPath.row].links.downloadURL
+        let imageDownloadURL = URL(string: downloadURLStr)!
+        
+        if let cachedImage = ImageCacheManager.shared.cachedImage(urlString: downloadURLStr) {
+            cell.imageView.image = cachedImage
+            return cell
+        }
+        
         URLSession.shared.dataTask(with: imageDownloadURL) { data, response, error in
             if let error = error {
                 print(error.localizedDescription)
                 
             } else if let data = data {
                 DispatchQueue.main.async {
+                    ImageCacheManager.shared.setObject(image: UIImage(data: data)!, urlString: downloadURLStr)
                     cell.imageView.image = UIImage(data: data)
                 }
             }
