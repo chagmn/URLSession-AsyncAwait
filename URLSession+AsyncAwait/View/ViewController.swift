@@ -72,9 +72,8 @@ extension ViewController: UICollectionViewDelegateFlowLayout {
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        
-        let width = (view.window?.windowScene?.screen.bounds.width)!
-        return CGSize(width: width-20, height: 500)
+        let width = (view.window?.windowScene?.screen.bounds.width)! / 2
+        return CGSize(width: width - 8, height: width - 8)
     }
     
 }
@@ -87,27 +86,13 @@ extension ViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCell.identifier, for: indexPath) as? PhotoCell else { return UICollectionViewCell() }
                 
-        if imageArr.count <= 0 { return cell }
-        let downloadURLStr: String = imageArr[indexPath.row].links.downloadURL
-        let imageDownloadURL = URL(string: downloadURLStr)!
-        
+        let downloadURLStr: String = imageArr[indexPath.row].urls.thumbURL
+    
         if let cachedImage = ImageCacheManager.shared.cachedImage(urlString: downloadURLStr) {
-            print("캐싱 ", indexPath.row)
             cell.imageView.image = cachedImage
             return cell
         }
-        
-        URLSession.shared.dataTask(with: imageDownloadURL) { data, response, error in
-            if let error = error {
-                print(error.localizedDescription)
-                
-            } else if let data = data {
-                DispatchQueue.main.async {
-                    ImageCacheManager.shared.setObject(image: UIImage(data: data)!, urlString: downloadURLStr)
-                    cell.imageView.image = UIImage(data: data)
-                }
-            }
-        }.resume()
+        cell.setupData(downloadURLStr: downloadURLStr)
         
         return cell
     }
@@ -116,21 +101,20 @@ extension ViewController: UICollectionViewDataSource {
 extension ViewController: UICollectionViewDataSourcePrefetching {
     func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
         for indexPath in indexPaths {
-            let imageUrl: String = imageArr[indexPath.row].links.downloadURL
-            print("prefetch ", indexPath.row)
+            let imageUrl: String = imageArr[indexPath.row].urls.thumbURL
+            
             guard let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: PhotoCell.identifier,
                 for: indexPath
             ) as? PhotoCell else { return }
-            
+
             DispatchQueue.global().async {
                 guard let data = try? Data(contentsOf: URL(string: imageUrl)!) else { return }
-                
+
                 DispatchQueue.main.async {
                     cell.imageView.image = UIImage(data: data)
                 }
             }
-          
         }
     }
 }

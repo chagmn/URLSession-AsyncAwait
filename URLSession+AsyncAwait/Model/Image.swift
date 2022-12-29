@@ -11,6 +11,7 @@ struct Image: Codable {
     let width: Int
     let height: Int
     let links: ImageLink
+    let urls: ImageURL
 }
 
 struct ImageLink: Codable {
@@ -18,5 +19,13 @@ struct ImageLink: Codable {
     
     enum CodingKeys: String, CodingKey {
         case downloadURL = "download"
+    }
+}
+
+struct ImageURL: Codable {
+    let thumbURL: String
+    
+    enum CodingKeys: String, CodingKey {
+        case thumbURL = "regular"
     }
 }

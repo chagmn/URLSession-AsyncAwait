@@ -34,8 +34,24 @@ final class PhotoCell: UICollectionViewCell {
     required init?(coder: NSCoder) { fatalError() }
 }
 
-private extension PhotoCell {
-    func setupView() {
+extension PhotoCell {
+    func setupData(downloadURLStr: String) {
+        if let downloadURL = URL(string: downloadURLStr) {
+            URLSession.shared.dataTask(with: downloadURL) { data, response, error in
+                if let error = error {
+                    print(error.localizedDescription)
+
+                } else if let data = data {
+                    DispatchQueue.main.async { [weak self] in
+                        ImageCacheManager.shared.setObject(image: UIImage(data: data)!, urlString: downloadURLStr)
+                        self?.imageView.image = UIImage(data: data)
+                    }
+                }
+            }.resume()
+        }
+    }
+    
+    private func setupView() {
         contentView.addSubview(imageView)
         
         imageView.snp.makeConstraints {
