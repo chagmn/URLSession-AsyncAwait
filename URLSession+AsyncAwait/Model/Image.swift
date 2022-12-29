@@ -26,6 +26,6 @@ struct ImageURL: Codable {
     let thumbURL: String
     
     enum CodingKeys: String, CodingKey {
-        case thumbURL = "regular"
+        case thumbURL = "small"
     }
 }
